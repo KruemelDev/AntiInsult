@@ -3,6 +3,7 @@ import discord
 from discord.ext import commands
 from dotenv import load_dotenv
 import mysql.connector
+import interactions
 
 intents = discord.Intents.default()
 intents.members = True
