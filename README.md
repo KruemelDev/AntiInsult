@@ -15,5 +15,5 @@ A Discord Bot which automatically deletes words which you want to have deleted. 
 - $addAllowedUser @discordname(Adds a user which is allowed to change the list)
 - $removeAllowedUser @discordname(Removes the allowed user)
 - $addInsult insultword(Adds a word to the auto delete list)
-- $removeInsult(Removes a word from the auto delete list)
+- $removeInsult insultword(Removes a word from the auto delete list)
 - $removeAll(Removes all word entrys from the list)
