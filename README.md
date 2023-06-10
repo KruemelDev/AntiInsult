@@ -1,5 +1,5 @@
 # AntiInsult
-A Discord Bot which automatically deletes words which you want to have deleted. And more.
+A Discord bot that automatically deletes words you want deleted on your server when they are written. And more.
 
 ## Functions:
 
