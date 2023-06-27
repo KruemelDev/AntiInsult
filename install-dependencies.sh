@@ -1,5 +1,4 @@
-pip install os
-pip install discord
-pip install discord.ext
-pip install mysql-connector-python
-pip install python-dotenv
+#!/bin/sh
+pip install --user discord
+pip install --user mysql-connector-python
+pip install --user python-dotenv

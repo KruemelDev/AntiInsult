@@ -26,8 +26,6 @@ mycursor.execute("CREATE DATABASE IF NOT EXISTS schimpfwoerter")
 mycursor.execute("USE schimpfwoerter")
 
 
-
-
 @bot.event
 async def on_message(message):
     list_of_insults = []
@@ -49,6 +47,8 @@ async def on_message(message):
         if not tables == []:
             mycursor.execute("SELECT insult FROM {}".format(insult_table_name))
             list_of_insults = mycursor.fetchall()
+            mycursor.execute("SELECT allowed_user_id FROM {}".format(allowed_authors_table_name))
+            allowed_authors = mycursor.fetchall()
     except:
         pass
 
@@ -57,10 +57,9 @@ async def on_message(message):
 
     guild = bot.get_guild(server_id)
     member = guild.get_member(message.author.id)
-    mycursor.execute("SELECT allowed_user_id FROM {}".format(allowed_authors_table_name))
-    allowed_authors = mycursor.fetchall()
 
-    def create_insult():
+
+    async def create_insult():
         for char in message.guild.name:
             if char == "$" or char == "'" or char == """""" or char == "#":
                 embed = discord.Embed(
@@ -82,7 +81,7 @@ async def on_message(message):
         )
         await message.channel.send(embed=embed)
         return
-    def add_user():
+    async def add_user():
         key_word_list = []
         for key_word in message.content.split():
             key_word_list.append(key_word)
@@ -128,7 +127,7 @@ async def on_message(message):
                 await message.channel.send(embed=embed)
             return
 
-    def remove_user():
+    async def remove_user():
         key_word_list = []
         for key_word in message.content.split():
             key_word_list.append(key_word)
@@ -150,7 +149,7 @@ async def on_message(message):
                               color=discord.Color.red())
         await message.channel.send(embed=embed)
         return
-    def add_insult():
+    async def add_insult():
         addinsultword = message.content[11:].lower().replace(" ", "")
         addinsultlist = [addinsultword]
         mycursor.execute("SELECT allowed_user_id FROM {}".format(allowed_authors_table_name))
@@ -189,7 +188,7 @@ async def on_message(message):
                                   color=discord.Color.red())
             await message.channel.send(embed=embed)
             return
-    def remove_insult():
+    async def remove_insult():
         removeinsultword = message.content[14:].lower().replace(" ", "")
         removeinsultlist = [removeinsultword]
         mycursor.execute("SELECT allowed_user_id FROM {}".format(allowed_authors_table_name))
@@ -224,7 +223,7 @@ async def on_message(message):
                                   color=discord.Color.red())
             await message.channel.send(embed=embed)
             return
-    def remove_all():
+    async def remove_all():
         mycursor.execute("DELETE FROM {}".format(insult_table_name))
         mydb.commit()
         embed = discord.Embed(title="Löschen Aller Einträge",
@@ -232,62 +231,62 @@ async def on_message(message):
                               color=discord.Color.green())
         await message.channel.send(embed=embed)
         return
+    async def remove_messages():
+        for i in list_of_insults:
+            if message.content.lower().replace(" ", "") in i:
+                await message.delete()
+                return
 
     if message.content.startswith('$createInsult'):
         if message.author.guild_permissions.administrator:
-            create_insult()
+            await create_insult()
         else:
             print("Check allowed authors")
             for allowed in allowed_authors:
                 if message.author.id in allowed:
-                    create_insult()
+                    await create_insult()
 
     if message.content.startswith('$addAllowedUser'):
         if message.author.guild_permissions.administrator:
-            add_user()
+            await add_user()
         else:
             for allowed in allowed_authors:
                 if message.author.id in allowed:
-                    add_user()
+                    await add_user()
 
     if message.content.startswith('$removeAllowedUser'):
-
         if message.author.guild_permissions.administrator:
-            remove_user()
+            await remove_user()
         else:
             for allowed in allowed_authors:
                 if message.author.id in allowed:
-                    remove_user()
+                     await remove_user()
 
     if message.content.startswith('$addInsult'):
         if message.author.guild_permissions.administrator:
-            add_insult()
+            await add_insult()
         else:
             for allowed in allowed_authors:
                 if message.author.id in allowed:
-                    add_insult()
+                    await add_insult()
 
     if message.content.startswith('$removeInsult'):
         if message.author.guild_permissions.administrator:
-            remove_insult()
+            await remove_insult()
         else:
             for allowed in allowed_authors:
                 if message.author.id in allowed:
-                    remove_insult()
+                    await remove_insult()
 
-    if message.content.startswith("$removeAll"):
+    if message.content.startswith("$removeInsults"):
         if message.author.guild_permissions.administrator:
-            remove_all()
+             await remove_all()
         else:
             for allowed in allowed_authors:
                 if message.author.id in allowed:
-                    remove_all()
+                    await remove_all()
 
-    for i in list_of_insults:
-        if message.content.lower().replace(" ", "") in i:
-            await message.delete()
-            return
-
+    await remove_messages()
 DISCORD_TOKEN = os.getenv("DISCORD_TOKEN")
 bot.run(DISCORD_TOKEN)
 
